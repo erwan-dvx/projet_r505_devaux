@@ -57,9 +57,26 @@ public class PlayerController {
         return ResponseEntity.created(location).body(saved);
     }
 
-    @PutMapping 
-    public void updatePlayer(@RequestBody Player player) {
-        this.repository.save(player);
+    @PutMapping("/{id}")
+    public Player updatePlayer(@PathVariable Long id, @RequestBody Player updated) {
+        Player player = this.repository.findById(id).orElseThrow(() -> new PlayerNotFoundException(id));
+
+        // La licence ne doit pas appartenir à un autre joueur
+        this.repository.findByNumLicense(updated.getNumLicense())
+                .filter(other -> !other.getId().equals(id))
+                .ifPresent(other -> {
+                    throw new PlayerAlreadyExistsException(updated.getNumLicense());
+                });
+
+        player.setName(updated.getName());
+        player.setFirstName(updated.getFirstName());
+        player.setNumLicense(updated.getNumLicense());
+        player.setDateOfBirth(updated.getDateOfBirth());
+        player.setSize(updated.getSize());
+        player.setWeight(updated.getWeight());
+        player.setStatut(updated.getStatut());
+
+        return this.repository.save(player);
     }
 
     @DeleteMapping("/{id}")
