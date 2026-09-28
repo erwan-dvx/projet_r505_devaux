@@ -36,7 +36,7 @@ public class Player {
     // cascade et orphanRemoval pour que lorsqu'un joueur est supprimé, ses commentaires aussi
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Comment> comments = new ArrayList<>();
+    private final List<Comment> comments = new ArrayList<>();
 
     // JPA/Hibernate a besoin d'un constructeur vide pour instancier l'entité
     protected Player() {}

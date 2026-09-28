@@ -25,4 +25,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleNotFound(CommentNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
     }
+
+    @ExceptionHandler(FixtureNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(FixtureNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
+    }
 }
