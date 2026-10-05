@@ -15,61 +15,43 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.exception.FixtureNotFoundException;
 import com.example.demo.model.Fixture;
-import com.example.demo.repository.FixtureRepository;
+import com.example.demo.service.FixtureService;
 
 @RestController 
 @RequestMapping("/fixtures")
 public class FixtureController {
-    private final FixtureRepository repository;
+    private final FixtureService fixtureService;
 
-    public FixtureController(FixtureRepository repository) {
-        this.repository = repository;
+    public FixtureController(FixtureService fixtureService) {
+        this.fixtureService = fixtureService;
     }
 
     @GetMapping
     public List<Fixture> getAllFixtures() {
-        return this.repository.findAll();
+        return fixtureService.findAll();
     }
 
     @GetMapping("/{id}")
     public Fixture getFixtureBydId(@PathVariable Long id) {
-        return this.repository
-            .findById(id)
-            .orElseThrow(() -> new FixtureNotFoundException(id));
+        return fixtureService.findById(id);
     }
 
     @PostMapping 
     public ResponseEntity<Fixture> createFixture(@RequestBody Fixture fixture) {
-        Fixture saved = this.repository.save(fixture);
+        Fixture saved = fixtureService.create(fixture);
         URI location = URI.create("/fixtures/" + saved.getId());
         return ResponseEntity.created(location).body(saved);
     }
 
     @PutMapping("/{id}")
     public Fixture updateFixture(@PathVariable Long id, @RequestBody Fixture updated) {
-        Fixture fixture = this.repository
-            .findById(id)
-            .orElseThrow(() -> new FixtureNotFoundException(id));
-
-        fixture.setDate(updated.getDate());
-        fixture.setNameOpponent(updated.getNameOpponent());
-        fixture.setAdress(updated.getAdress());
-        fixture.setAtHome(updated.getAtHome());
-        fixture.setScoreHome(updated.getScoreHome());
-        fixture.setScoreOutside(updated.getScoreOutside());
-
-        return this.repository.save(fixture);
+        return fixtureService.update(id, updated);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFixture(@PathVariable Long id) {
-        if (!this.repository.existsById(id)) {
-            throw new FixtureNotFoundException(id);
-        }
-
-        this.repository.deleteById(id);
+        fixtureService.delete(id);
     }
 }

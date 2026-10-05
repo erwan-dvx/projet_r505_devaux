@@ -17,74 +17,44 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.Player;
 import com.example.demo.model.Statut;
-import com.example.demo.repository.PlayerRepository;
-import com.example.demo.exception.PlayerNotFoundException;
-import com.example.demo.exception.PlayerAlreadyExistsException;
+import com.example.demo.service.PlayerService;
 
 
 @RestController
 @RequestMapping("/players")
 public class PlayerController {
-    private final PlayerRepository repository;
+    private final PlayerService playerService;
 
-    public PlayerController(PlayerRepository playerRepository) {
-        this.repository = playerRepository;
+    public PlayerController(PlayerService playerService) {
+        this.playerService = playerService;
     }
     
     @GetMapping
     public List<Player> getAllPlayers(@RequestParam(required = false) Statut statut) {
-        if (statut == null) {
-            return this.repository.findAll();
-        }
-        return this.repository.findByStatut(statut);
+        return playerService.findAll(statut);
     }
 
     @GetMapping("/{id}")    
     public Player getPlayerById(@PathVariable Long id) {
-        return this.repository.findById(id).orElseThrow(() -> new PlayerNotFoundException(id));
+        return playerService.findById(id);
     }
     
 
     @PostMapping
     public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
-        int numLicence = player.getNumLicense();
-        if (this.repository.existsByNumLicense(numLicence)) {
-            throw new PlayerAlreadyExistsException(numLicence);
-        }
-
-        Player saved = this.repository.save(player);
+        Player saved = playerService.create(player);
         URI location = URI.create("/players/" + saved.getId());
         return ResponseEntity.created(location).body(saved);
     }
 
     @PutMapping("/{id}")
     public Player updatePlayer(@PathVariable Long id, @RequestBody Player updated) {
-        Player player = this.repository.findById(id).orElseThrow(() -> new PlayerNotFoundException(id));
-
-        // La licence ne doit pas appartenir à un autre joueur
-        this.repository.findByNumLicense(updated.getNumLicense())
-                .filter(other -> !other.getId().equals(id))
-                .ifPresent(other -> {
-                    throw new PlayerAlreadyExistsException(updated.getNumLicense());
-                });
-
-        player.setName(updated.getName());
-        player.setFirstName(updated.getFirstName());
-        player.setNumLicense(updated.getNumLicense());
-        player.setDateOfBirth(updated.getDateOfBirth());
-        player.setSize(updated.getSize());
-        player.setWeight(updated.getWeight());
-        player.setStatut(updated.getStatut());
-
-        return this.repository.save(player);
+        return playerService.update(id, updated);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePlayer(@PathVariable Long id) {
-        if (!this.repository.existsById(id)) {
-            throw new PlayerNotFoundException(id);
-        }
-        this.repository.deleteById(id);
+        playerService.delete(id);
     }
 }
