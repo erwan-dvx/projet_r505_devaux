@@ -37,7 +37,11 @@ public class Player {
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private final List<Comment> comments = new ArrayList<>();
-
+    
+    @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Participation> participations = new ArrayList<>();
+    
     // JPA/Hibernate a besoin d'un constructeur vide pour instancier l'entité
     protected Player() {}
 
@@ -75,6 +79,14 @@ public class Player {
 
     public String getStatutLabel() {
         return this.statut != null ? this.statut.getLabel() : null;
+    }
+
+    public List<Comment> getComments() {
+        return this.comments;
+    }
+
+    public List<Participation> getParticipations() {
+        return this.participations;
     }
 
     public void setName(String name) {

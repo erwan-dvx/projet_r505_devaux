@@ -30,4 +30,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleNotFound(FixtureNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
     }
+
+    @ExceptionHandler(ParticipationNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(ParticipationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ParticipationConflictException.class)
+    public ResponseEntity<Map<String, String>> handleConflict(ParticipationConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", ex.getMessage()));
+    }
 }

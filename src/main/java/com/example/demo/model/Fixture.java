@@ -1,11 +1,17 @@
 package com.example.demo.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity 
@@ -21,6 +27,10 @@ public class Fixture {
     private boolean atHome; 
     private int scoreHome; 
     private int scoreOutside;
+
+    @OneToMany(mappedBy = "fixture", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Participation> participations = new ArrayList<>();
 
     protected Fixture() {}
 
@@ -50,6 +60,10 @@ public class Fixture {
 
     public int getScoreOutside() {
         return this.scoreOutside;
+    }
+
+    public List<Participation> getParticipations() {
+        return this.participations;
     }
 
     public void setDate(LocalDateTime newDate) {
