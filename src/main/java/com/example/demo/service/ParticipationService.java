@@ -13,6 +13,7 @@ import com.example.demo.exception.PlayerNotFoundException;
 import com.example.demo.model.Fixture;
 import com.example.demo.model.Participation;
 import com.example.demo.model.Player;
+import com.example.demo.model.Position;
 import com.example.demo.model.Statut;
 import com.example.demo.repository.FixtureRepository;
 import com.example.demo.repository.ParticipationRepository;
@@ -46,6 +47,37 @@ public class ParticipationService {
 	public List<Participation> findByFixtureId(Long fixtureId) {
 		getFixture(fixtureId);
 		return participationRepository.findByFixtureId(fixtureId);
+	}
+
+	public Participation create(Long fixtureId, Position namePosition, Long playerId) {
+		Fixture fixture = getFixture(fixtureId);
+		if (namePosition == null) {
+			throw new ParticipationConflictException("The position is required");
+		}
+
+		ensureBeforeFixture(fixture, "A participation cannot be created after the fixture");
+
+		boolean positionAlreadyUsed = participationRepository.findByFixtureId(fixtureId).stream()
+				.anyMatch(existing -> namePosition == existing.getNamePosition());
+		if (positionAlreadyUsed) {
+			throw new ParticipationConflictException("The position is already used for this fixture");
+		}
+
+		Player player = playerId == null ? null : getPlayer(playerId);
+		if (player != null) {
+			if (player.getStatut() != Statut.AVAILABLE) {
+				throw new ParticipationConflictException("The player is not available");
+			}
+
+			boolean playerAlreadyAssigned = participationRepository.findByFixtureId(fixtureId).stream()
+					.anyMatch(existing -> player.equals(existing.getPlayer()));
+			if (playerAlreadyAssigned) {
+				throw new ParticipationConflictException("The player is already assigned to this fixture");
+			}
+		}
+
+		Participation participation = new Participation(fixture, player, namePosition);
+		return participationRepository.save(participation);
 	}
 
 	public Participation assignPlayer(Long participationId, Long playerId) {

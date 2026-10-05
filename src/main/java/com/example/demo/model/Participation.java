@@ -36,6 +36,13 @@ public class Participation {
 
     protected Participation() {}
 
+    public Participation(Fixture fixture, Player player, Position namePosition) {
+        this.fixture = fixture;
+        this.player = player;
+        this.namePosition = namePosition;
+        this.numberJersey = namePosition.getJerseyNumber();
+    }
+
     public Long getId() {
         return this.id;
     }
