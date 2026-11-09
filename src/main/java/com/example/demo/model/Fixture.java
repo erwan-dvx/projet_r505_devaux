@@ -25,8 +25,8 @@ public class Fixture {
     private String nameOpponent;
     private String adress;
     private boolean atHome; 
-    private int scoreHome; 
-    private int scoreOutside;
+    private Integer scoreHome; 
+    private Integer scoreOutside;
 
     @OneToMany(mappedBy = "fixture", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -54,11 +54,11 @@ public class Fixture {
         return this.atHome;
     }
 
-    public int getScoreHome() {
+    public Integer getScoreHome() {
         return this.scoreHome;
     }
 
-    public int getScoreOutside() {
+    public Integer getScoreOutside() {
         return this.scoreOutside;
     }
 
@@ -82,11 +82,11 @@ public class Fixture {
         this.atHome = atHome;
     }
 
-    public void setScoreHome(int scoreHome) {
+    public void setScoreHome(Integer scoreHome) {
         this.scoreHome = scoreHome;
     }
 
-    public void setScoreOutside(int scoreOutside) {
+    public void setScoreOutside(Integer scoreOutside) {
         this.scoreOutside = scoreOutside;
     }
 }
