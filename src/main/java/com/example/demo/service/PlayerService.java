@@ -9,6 +9,7 @@ import com.example.demo.exception.PlayerAlreadyExistsException;
 import com.example.demo.exception.PlayerNotFoundException;
 import com.example.demo.model.Player;
 import com.example.demo.model.Statut;
+import com.example.demo.repository.ParticipationRepository;
 import com.example.demo.repository.PlayerRepository;
 
 @Service
@@ -16,9 +17,11 @@ import com.example.demo.repository.PlayerRepository;
 public class PlayerService {
 
     private final PlayerRepository playerRepository;
+    private final ParticipationRepository participationRepository;
 
-    public PlayerService(PlayerRepository playerRepository) {
+    public PlayerService(PlayerRepository playerRepository, ParticipationRepository participationRepository) {
         this.playerRepository = playerRepository;
+        this.participationRepository = participationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -58,12 +61,22 @@ public class PlayerService {
         player.setDateOfBirth(updated.getDateOfBirth());
         player.setSize(updated.getSize());
         player.setWeight(updated.getWeight());
+        if (player.getStatut() == Statut.AVAILABLE && updated.getStatut() != Statut.AVAILABLE) {
+            invalidateSheets(id);
+        }
         player.setStatut(updated.getStatut());
 
         return playerRepository.save(player);
     }
 
     public void delete(Long id) {
-        playerRepository.delete(findById(id));
+        Player player = findById(id);
+        invalidateSheets(id);
+        playerRepository.delete(player);
+    }
+
+    private void invalidateSheets(Long playerId) {
+        participationRepository.findByPlayerId(playerId).forEach(participation ->
+                participation.getFixture().setSheetValidated(false));
     }
 }

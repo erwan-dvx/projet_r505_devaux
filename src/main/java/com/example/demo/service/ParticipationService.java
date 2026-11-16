@@ -77,6 +77,7 @@ public class ParticipationService {
 		}
 
 		Participation participation = new Participation(fixture, player, namePosition);
+		fixture.setSheetValidated(false);
 		return participationRepository.save(participation);
 	}
 
@@ -99,6 +100,7 @@ public class ParticipationService {
 		}
 
 		participation.setPlayer(player);
+		fixture.setSheetValidated(false);
 		return participationRepository.save(participation);
 	}
 
@@ -107,6 +109,7 @@ public class ParticipationService {
 		ensureBeforeFixture(participation.getFixture(), "A player cannot be removed after the fixture");
 
 		participation.setPlayer(null);
+		participation.getFixture().setSheetValidated(false);
 		return participationRepository.save(participation);
 	}
 

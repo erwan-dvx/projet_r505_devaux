@@ -27,6 +27,7 @@ public class Fixture {
     private boolean atHome; 
     private Integer scoreHome; 
     private Integer scoreOutside;
+    private boolean sheetValidated;
 
     @OneToMany(mappedBy = "fixture", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -62,6 +63,10 @@ public class Fixture {
         return this.scoreOutside;
     }
 
+    public boolean isSheetValidated() {
+        return sheetValidated;
+    }
+
     public List<Participation> getParticipations() {
         return this.participations;
     }
@@ -88,5 +93,9 @@ public class Fixture {
 
     public void setScoreOutside(Integer scoreOutside) {
         this.scoreOutside = scoreOutside;
+    }
+
+    public void setSheetValidated(boolean sheetValidated) {
+        this.sheetValidated = sheetValidated;
     }
 }
